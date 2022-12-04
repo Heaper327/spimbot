@@ -101,15 +101,40 @@ behavior_loop:                                  # while (true)
 
 get_water_end:
 
+    li      $t0, 0x000400fe
+    sw      $t0, POWERWASH_ON                   # powerwash_on(4, 0, -2)
     
     li      $a0, 0
-    li      $a1, 1
+    li      $a1, 35
     jal     move_tile
 
-try_move_end:
+    li      $a0, 1
+    li      $a1, 12
+    jal     move_tile
 
-    li      $t0, 0x000400fe
-    sw      $t0, POWERWASH_ON                   # powerwash_on(2, 0, -2)
+    li      $a0, 2
+    li      $a1, 14
+    jal     move_tile
+
+    li      $a0, 3
+    li      $a1, 5
+    jal     move_tile
+
+    li      $a0, 2
+    li      $a1, 7
+    jal     move_tile
+
+    li      $a0, 1
+    li      $a1, 5
+    jal     move_tile
+
+    li      $a0, 2
+    li      $a1, 14
+    jal     move_tile
+
+    li      $a0, 3
+    li      $a1, 12
+    jal     move_tile
 
     j       behavior_loop
 
@@ -119,9 +144,10 @@ try_move_end:
 
 # HELPER FUNCTIONS ================================================================================
 
-# checks if the bot can walk in a specified direction
+
+# checks if the bot can walk one tile to the right
 # $a0 represents the movement direction. 0 to 3 represents right, up, left, down respectively
-can_move:
+can_move_right:
 
     sub     $sp, 16
     sw      $ra, 0($sp)
@@ -138,7 +164,7 @@ can_move:
     bge     $t0, $t1, try_move_end              # if (x + 1 < 40)
 
     lw      $t1, BOT_Y                          # load y
-    div     $t1, TILE_SIZE
+    div     $t1, $t1, TILE_SIZE
     mul     $t1, $t1, 40
     add     $t1, $t1, $t0
     mul     $t1, $t1, 2
@@ -188,8 +214,8 @@ request_puzzle_end:
     add     $sp, 16
     jr      $ra
 
-# clean the fixed spawn center window
-clean_center_window:
+# move to the fixed spawn center window
+go_to_center_window:
 
     sub     $sp, 12
     sw      $ra, 0($sp)
