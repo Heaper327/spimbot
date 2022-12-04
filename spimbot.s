@@ -212,6 +212,11 @@ request_puzzle_end:
     lw      $s1, 8($sp)
     lw      $s2, 12($sp)
     add     $sp, 16
+
+    lw      $t0, GET_WATER_LEVEL
+    li      $t7, 6000000
+    blt     $t0, $t7, get_water
+
     jr      $ra
 
 # move to the fixed spawn center window
