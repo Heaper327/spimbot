@@ -56,6 +56,7 @@ mapwrapper:            .byte 3200
 has_puzzle: .byte 0
 has_bonked: .byte 0
 is_falling: .byte 0
+has_landed: .byte 0
 # -- string literals --
 string: .asciiz "Hello World\n"
 
@@ -136,11 +137,39 @@ get_water_end:
     jal     move_tile
 
     li      $a0, 2
-    li      $a1, 14
+    li      $a1, 9
     jal     move_tile
 
+    li      $a0, 1
+    li      $a1, 9
+    jal     move_tile
+
+    li      $t0, 0x00040002
+    sw      $t0, POWERWASH_ON                   # powerwash_on(4, 0, -2)
+
+    li      $a0, 0
+    li      $a1, 25
+    jal     move_tile
+
+    li      $t0, 0x00040200
+    sw      $t0, POWERWASH_ON                   # powerwash_on(4, 0, -2)
+
+    li      $a0, 1
+    li      $a1, 13
+    jal     move_tile
+
+    li      $t0, 0x00000000
+    sw      $t0, POWERWASH_ON                   # powerwash_on(4, 0, -2)
+
     li      $a0, 3
-    li      $a1, 12
+    li      $a1, 20
+    jal     move_tile
+
+    li      $t0, 0x00040200
+    sw      $t0, POWERWASH_ON                   # powerwash_on(4, 0, -2)
+
+    li      $a0, 1
+    li      $a1, 7
     jal     move_tile
 
     j       behavior_loop
@@ -221,7 +250,7 @@ request_puzzle_end:
     add     $sp, 16
 
     lw      $t0, GET_WATER_LEVEL
-    li      $t7, 6000000
+    li      $t7, 5500000
     blt     $t0, $t7, get_water
 
     jr      $ra
@@ -324,7 +353,7 @@ move_loop:
     lb      $s3, 0($s3)
     beq     $s3, $s2, move_loop_end
 
-    la      $s3, is_falling
+    la      $s3, has_landed
     lb      $s3, 0($s3)
     beq     $s3, $s2, move_loop_end
 
@@ -437,6 +466,8 @@ stop_falling_interrupt:
     sw      $0, STOP_FALLING_ACK
     la      $t0, is_falling
     li      $t1, 1
+    sb      $t1, 0($t0)
+    la      $t0, has_landed
     sb      $t1, 0($t0)
     j       interrupt_dispatch
 
